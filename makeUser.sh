@@ -38,16 +38,14 @@ function tepmpate(){
 function configure_site(){
     site="$1"
     port="$2"
-    path="/etc/nginx/sites-available/$site"
-    if [ -e "$path" ];then
+    path="/etc/nginx/sites-available"
+    pathOfSite="/etc/nginx/sites-available/$site"
+    if [ -e "$pathOfSite" ];then
         echo "$site existe"
         return 1
     fi
     
-    cp "/etc/nginx/sites-available/default" "$path"
-
-    sed -i "s/listen .*/listen [::]:$port default_server;/g; s/root \/var\/www\/ .*/var/www/$site;/g; s/server_name .*/server_name $site;/g" "$path"
-    
+    cp "./template.conf" "$path"
     mkdir -p "/var/www/$site"
 
     echo "$site" > "/var/www/$site/index.html"
