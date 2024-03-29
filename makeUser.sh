@@ -35,7 +35,7 @@ function installNginx(){
 function tepmpate(){
     echo "$site"
 }
-function configure_site(){
+function configureSite(){
     site="$1"
     port="$2"
     path="/etc/nginx/sites-available"
@@ -45,10 +45,36 @@ function configure_site(){
         return 1
     fi
     
-    cp "./template.conf" "$path"
-    mkdir -p "/var/www/$site"
+    cp "./template.conf" "$path/$site"
+    sed -i "s/(httpport) .*/$port default_server;/g; s/(site)/$site/g" "$path/$site"
 
-    echo "$site" > "/var/www/$site/index.html"
+    mkdir -p "/var/www/$site"
+    cp "./index.html" "/var/www/$site"
+    sed -i "s/(site)/$site/g" "/var/www/$site/index.html"
+}
+function activeSite(){
+    site="$1"
+    pathOfSite="/etc/nginx/sites-available/${site}"
+    if [ ! -e "$pathOfSite" ];then
+        echo "$site does not existe"
+        return 1
+    fi
+
+    nginxFolder="/etc/nginx/sites-enabled"
+
+    if [ ! -d "$nginxFolder" ]; then
+        mkdir -p "$nginxFolder" || { echo "Failed to create directory $nginxFolder"; exit 1; }
+    fi
+    echo "$pathOfSite $nginxFolder"
+        xdg-open 'http://www.youtube.com'
+
+    ln -s "$pathOfSite" "$nginxFolder/${site}" || { echo "Failed to create symbolic link"; exit 1; }
+    echo "$site is active"
+
+    echo "Reload nginx"
+    systemctl reload nginx
+
+    echo "Openning browser"
 }
 
 case $1 in
@@ -61,6 +87,10 @@ case $1 in
         setPassword "$2" "$3"
     ;;
     configure_site | cs)
-        configure_site "$2" "$3"
+        configureSite "$2" "$3"
     ;;
+    active_site | as)
+        activeSite "$2"
+    ;;
+    
 esac
