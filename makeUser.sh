@@ -6,8 +6,7 @@ if [ "$EUID" -ne 0 ]; then
 fi 
 
 function createUser(){
-    username="$1"
-    echo $username
+    local username="$1"
     echo "Create a new user"
     if id "$username" &>/dev/null; then
         echo "User '$username' exists"
@@ -19,7 +18,7 @@ function createUser(){
 }
 
 function setPassword(){
-    username="$1"
+    local username="$1"
     pwd="$2"
     echo "Add password for user:" "$username"
     echo "$username:$pwd" | chpasswd --e
@@ -30,16 +29,14 @@ function update(){
 }
 
 function installNginx(){
-    apt install nginx
+    apt install nginx -y
 }
-function tepmpate(){
-    echo "$site"
-}
+
 function configureSite(){
-    site="$1"
-    port="$2"
-    path="/etc/nginx/sites-available"
-    pathOfSite="/etc/nginx/sites-available/$site"
+    local site="$1"
+    local port="$2"
+    local path="/etc/nginx/sites-available"
+    local pathOfSite="/etc/nginx/sites-available/$site"
     if [ -e "$pathOfSite" ];then
         echo "$site existe"
         return 1
@@ -53,14 +50,14 @@ function configureSite(){
     sed -i "s/(site)/$site/g" "/var/www/$site/index.html"
 }
 function activeSite(){
-    site="$1"
-    pathOfSite="/etc/nginx/sites-available/${site}"
+    local site="$1"
+    local pathOfSite="/etc/nginx/sites-available/${site}"
     if [ ! -e "$pathOfSite" ];then
         echo "$site does not existe"
         return 1
     fi
 
-    nginxFolder="/etc/nginx/sites-enabled"
+    local nginxFolder="/etc/nginx/sites-enabled"
 
     if [ ! -d "$nginxFolder" ]; then
         mkdir -p "$nginxFolder" || { echo "Failed to create directory $nginxFolder"; exit 1; }
