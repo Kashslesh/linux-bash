@@ -63,15 +63,17 @@ function activeSite(){
         mkdir -p "$nginxFolder" || { echo "Failed to create directory $nginxFolder"; exit 1; }
     fi
 
-    xdg-open 'http://localhost:8080'
-
     ln -s "$pathOfSite" "$nginxFolder/${site}" || { echo "Failed to create symbolic link"; exit 1; }
     echo "$site is active"
 
     echo "Reload nginx"
     systemctl reload nginx
-
-    echo "Openning browser"
+}
+function cronJob(){
+    local path=$(pwd)
+    echo "* * * * * "$USER" echo "Hello world" >> $path/cronJob.txt">> /etc/crontab
+    echo "* * * * * $USER echo "Hello world" >> $path/disk_log.txt" >> /etc/crontab
+    service cron reload
 }
 
 case $1 in
@@ -89,8 +91,8 @@ case $1 in
     active_site | as)
         activeSite "$2"
     ;;
-    cron_job | cb)
-        cronJob "$2"
+    cron_job | cj)
+        cronJob
     ;;
     
 esac
