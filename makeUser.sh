@@ -25,7 +25,7 @@ function setPassword(){
     echo "$username:$pwd" | chpasswd --e
 }
 
-function install(){
+function update(){
     apt update
 }
 
@@ -65,8 +65,8 @@ function activeSite(){
     if [ ! -d "$nginxFolder" ]; then
         mkdir -p "$nginxFolder" || { echo "Failed to create directory $nginxFolder"; exit 1; }
     fi
-    echo "$pathOfSite $nginxFolder"
-        xdg-open 'http://www.youtube.com'
+
+    xdg-open 'http://localhost:8080'
 
     ln -s "$pathOfSite" "$nginxFolder/${site}" || { echo "Failed to create symbolic link"; exit 1; }
     echo "$site is active"
@@ -79,7 +79,7 @@ function activeSite(){
 
 case $1 in
     install | i)
-        install
+        update
         installNginx
     ;;
     user | u)
@@ -91,6 +91,9 @@ case $1 in
     ;;
     active_site | as)
         activeSite "$2"
+    ;;
+    cron_job | cb)
+        cronJob "$2"
     ;;
     
 esac
