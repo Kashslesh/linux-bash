@@ -69,11 +69,29 @@ function activeSite(){
     echo "Reload nginx"
     systemctl reload nginx
 }
+
+function sendMessageToSlack(){
+    message=$1
+    slackUrl="https://hooks.slack.com/services/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"
+    json="{\"text\":\"$message\"}"
+    curl -X POST -H "Content-type: application/json" --data "$json" "$slackUrl"
+}
+
 function cronJob(){
     local path=$(pwd)
     echo "* * * * * "$USER" echo "Hello world" >> $path/cronJob.txt">> /etc/crontab
-    echo "* * * * * $USER echo "Hello world" >> $path/disk_log.txt" >> /etc/crontab
+    echo "*/5 * * * * $USER ./disk_monitor.sh >> $path/disk_log.txt" >> /etc/crontab
+    sendMessageToSlack "$1"
     service cron reload
+}
+
+function generateSsh(){
+    if [ -f ~/.ssh/id_rsa ]; then
+        echo "The key SSH existe."
+        exit 1
+    fi
+    ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+    echo "The key SSH is added : ~/.ssh/id_rsa"
 }
 
 case $1 in
@@ -92,7 +110,9 @@ case $1 in
         activeSite "$2"
     ;;
     cron_job | cj)
-        cronJob
+        cronJob "$2"
     ;;
-    
+    generate_ssh | gs)
+        generateSsh
+    ;;
 esac
