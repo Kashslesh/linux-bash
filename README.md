@@ -57,5 +57,3 @@ This Bash script provides various actions for system automation tasks, including
 - Ensure the script is executed with appropriate permissions.
 - Modify Slack webhook URL in the script to your actual webhook URL.
 - Customize configurations and paths as per your system requirements.
-
-Feel free to explore and modify the script according to your needs. For any questions or issues, please create an [issue](https://github.com/your/repository/issues).
